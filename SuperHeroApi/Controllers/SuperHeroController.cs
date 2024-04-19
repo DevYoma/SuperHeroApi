@@ -18,15 +18,15 @@ namespace SuperHeroApi.Controllers
         [HttpGet]
         public async Task<ActionResult<List<SuperHero>>> GetAllHeroes()
         {
-            await Task.Delay(5000); // simulating a 5secs delay
-            return Ok(_superHeroService.GetAllHeroes());
+            /*await Task.Delay(5000);*/ // simulating a 5secs delay
+            return await _superHeroService.GetAllHeroes();
         }
 
         [HttpGet]
         [Route("{id:int}")]
         public async Task<ActionResult<List<SuperHero>>> GetSingleHero(int id)
         {
-            var result = _superHeroService.GetSingleHero(id);
+            var result = await _superHeroService.GetSingleHero(id);
 
             if(result == null)
             {
@@ -39,7 +39,7 @@ namespace SuperHeroApi.Controllers
         [HttpPost]
         public async Task<ActionResult<List<SuperHero>>> AddHero([FromBody]SuperHero hero)
         {
-            var result = _superHeroService.AddHero(hero);
+            var result = await _superHeroService.AddHero(hero);
 
             return Ok(result);
         }
@@ -47,14 +47,14 @@ namespace SuperHeroApi.Controllers
         [HttpPut("{id:int}")]
         public async Task<ActionResult<SuperHero>> UpdateHero(int id, [FromBody]SuperHero request)
         {
-            var result = _superHeroService.UpdateHero(id, request);
+            var result = await _superHeroService.UpdateHero(id, request);
             return Ok(result);
         }
 
         [HttpDelete("{id:int}")]
         public async Task<ActionResult<SuperHero>> DeleteHero(int id)
         {
-            var result = _superHeroService.DeleteHero(id);
+            var result = await _superHeroService.DeleteHero(id);
 
             if (result is null)
             {

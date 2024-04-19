@@ -1,5 +1,7 @@
 global using SuperHeroApi.Models;
+global using SuperHeroApi.Data;
 using SuperHeroApi.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +14,12 @@ builder.Services.AddSwaggerGen();
 
 // registering the ISuperHeroService
 builder.Services.AddScoped<ISuperHeroService, SuperHeroService>();
+// registering DBContext
+builder.Services.AddDbContext<DataContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SuperHeroDBConnection"));
+});
+
 
 var app = builder.Build();
 

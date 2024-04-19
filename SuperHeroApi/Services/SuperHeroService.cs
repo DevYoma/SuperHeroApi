@@ -1,63 +1,44 @@
-﻿namespace SuperHeroApi.Services
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace SuperHeroApi.Services
 {
     public class SuperHeroService : ISuperHeroService
     {
-        private static List<SuperHero> superHeroes = new List<SuperHero>
+        private readonly DataContext _context;  
+        public SuperHeroService(DataContext context)
         {
-            new SuperHero {Id = 1, FirstName="Clark", LastName="Kent", Name="SuperMan", Place="Metropolis"},
-            new SuperHero {Id = 2, FirstName="Peter", LastName="Parker", Name="SpiderMan", Place="NYC"},
-            new SuperHero {Id = 3, FirstName="Bruce", LastName="Wayne", Name="Batman", Place="Gotham"},
-            new SuperHero {Id = 4, FirstName="Tony", LastName="Stark", Name="IronMan", Place="Malibu"},
-        };
-
-        public List<SuperHero> AddHero(SuperHero hero)
-        {
-            superHeroes.Add(hero);
-            return superHeroes;
+            _context = context;
         }
 
-        public List<SuperHero>? DeleteHero(int id)
+        public async Task<List<SuperHero>> GetAllHeroes()
         {
-            var hero = superHeroes.Find(x => x.Id == id);
-            if (hero == null)
-            {
-                return null; // good time to use Custom Exception errors
-            }
-
-            superHeroes.Remove(hero);
-            return superHeroes;
+            var heroes = await _context.SuperHeroes.ToListAsync();
+            return heroes;
         }
-
-        public List<SuperHero> GetAllHeroes()
-        {
-            return superHeroes;
-        }
-
-        public SuperHero? GetSingleHero(int id)
+        public async Task<SuperHero?> GetSingleHero(int id)
         {
             if (id <= 0)
             {
                 return null;
             }
 
-            var hero = superHeroes.Find(hero => hero.Id == id);
+            var hero = await _context.SuperHeroes.FindAsync(id);
 
-            if (hero == null || hero.Id > superHeroes.Count)
+            if (hero == null)
             {
                 return null;
             }
 
             return hero;
         }
-
-        public List<SuperHero>? UpdateHero(int id, SuperHero request)
+        public async Task<List<SuperHero>?> UpdateHero(int id, SuperHero request)
         {
             if (id <= 0)
             {
                 return null;
             }
 
-            var hero = superHeroes.Find(hero => hero.Id == id);
+            var hero = await _context.SuperHeroes.FindAsync(id);
             if (hero is null)
             {
                 return null;
@@ -68,7 +49,28 @@
             hero.Place = request.Place;
             hero.Name = request.Name;
 
-            return superHeroes;
+            await _context.SaveChangesAsync();
+
+            return await _context.SuperHeroes.ToListAsync(); // returns the array/list
+        }
+        public async Task<List<SuperHero>> AddHero(SuperHero hero)
+        {
+            _context.SuperHeroes.Add(hero);
+            await _context.SaveChangesAsync();
+            return await _context.SuperHeroes.ToListAsync();
+        }
+        public async Task<List<SuperHero>?> DeleteHero(int id)
+        {
+            var hero = await _context.SuperHeroes.FindAsync(id);
+            if (hero == null)
+            {
+                return null; // good time to use Custom Exception errors
+            }
+
+            _context.SuperHeroes.Remove(hero);
+            await _context.SaveChangesAsync();
+
+            return await _context.SuperHeroes.ToListAsync();
         }
     }
 }
